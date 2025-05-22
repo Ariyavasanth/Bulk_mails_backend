@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: 'https://bulk-mails-backend.onrender.com' }));
 app.use(express.json());
 
 mongoose
