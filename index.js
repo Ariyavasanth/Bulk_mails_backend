@@ -1,72 +1,83 @@
 const express = require("express");
 const cors = require("cors");
-
-const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-
+const mongoose = require("mongoose");
 const app = express();
 
-appapp.use(cors({
-  origin: 'https://your-frontend-domain.com', // ✅ change this to your real frontend URL
-  methods: ['GET', 'POST'],
-  credentials: true
-}));
+// CORS configuration
+app.use(cors());
 
-
+//middle ware for post and put
 app.use(express.json());
 
+// /connected to db
 mongoose
-  .connect("mongodb://127.0.0.1:27017/passkey")
-  .then(function () {
-    console.log("Connected to DB");
+  .connect(
+    "mongodb+srv://ariya:123@cluster0.cwaattt.mongodb.net/passkey?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    console.log("db connected sucessfully");
   })
-  .catch(function () {
-    console.log("Failed to connect");
+  .catch(() => {
+    console.log("db not connected");
   });
-const credentails = mongoose.model("credentails", {}, "bulkmail");
 
-app.post("/sendmail", function (req, res) {
+const credentialSchema = new mongoose.Schema({
+  user: String,
+  pass: String,
+});
+
+const Credential = mongoose.model("Credential", credentialSchema, "bulkmail");
+
+//cret a model to for connected to collection
+
+app.post("/sendmail", async function (req, res) {
+  console.log(req.body);
   var msg = req.body.msg;
   var emailList = req.body.email;
 
-  credentails
-    .find()
-    .then(function (data) {
+  Credential.find()
+    .then((data) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: data[0].toJSON().user,
-          pass: data[0].toJSON().pass,
+          // Replace these with your real Gmail credentials or use .env for safety
+          user: data[0].user,
+          pass: data[0].pass,
         },
       });
+      console.log("User:", data[0].user);
+      console.log("Pass:", data[0].pass);
+
       new Promise(async function (resolve, reject) {
         try {
-          for (var i = 0; i < emailList.length; i++) {
+          for (let i = 0; i < emailList.length; i++) {
             await transporter.sendMail({
               from: "ariyavasanth933@gmail.com",
               to: emailList[i],
-              subject: "a message fior bulk mail",
+              subject: "A message from Bulk Mail App",
               text: msg,
             });
-            console.log("Email sent to:" + emailList[i]);
+            console.log("Email sent to: " + emailList[i]);
           }
           resolve("Sucess");
         } catch (error) {
-          reject("Fail");
+          console.error("Failed to send some/all emails", error);
+          reject("failed");
         }
       })
-        .then(function () {
+        .then(() => {
           res.send(true);
         })
-        .catch(function () {
+        .catch(() => {
           res.send(false);
         });
     })
-    .catch(function (error) {
-      console.log(error);
+    .catch((error) => {
+      console.log("error", error);
     });
 });
 
-app.listen(3000, function (req, res) {
-  console.log("server sited.....");
+app.listen(3000, function () {
+  console.log("Server started on http://localhost:3000");
 });
