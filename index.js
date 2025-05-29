@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const app = express();
 
-app.use(cors({ origin: "https://frontend-dun-one-58.vercel.app" }));
+app.use(cors({ origin: "https://bulkmailfrontend.vercel.app" }));
 
 //middle ware for post and put
 app.use(express.json());
