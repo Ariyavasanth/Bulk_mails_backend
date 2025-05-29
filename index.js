@@ -4,9 +4,6 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const app = express();
 
-// CORS configuration
-const cors = require("cors");
-
 app.use(cors({ origin: "https://frontend-dun-one-58.vercel.app" }));
 
 //middle ware for post and put
