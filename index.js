@@ -4,12 +4,22 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const app = express();
 
-app.use(
-  cors({
-    origin:
-      "https://bulkmailfrontend-e7bi0egym-ariyas-projects-4100aac3.vercel.app",
-  })
-);
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://bulkmailfrontend.vercel.app",
+  "https://bulkmailfrontend-e7bi0egym-ariyas-projects-4100aac3.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS Not Allowed: " + origin));
+    }
+  }
+}));
+
 
 //middle ware for post and put
 app.use(express.json());
